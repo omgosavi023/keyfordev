@@ -6,8 +6,22 @@ echo "Enter image name you want to create"
 printf "1.Python \n2.Java \n3.C \n4.SQL \n5.BASH\n"
 read img
 
+function dockerpush() {
+echo "Do you want to push it to docker hub"
+read choice
 
-function python() { 
+if [[ $choice == 'y' ]];then
+docker login
+echo "Enter username"
+read uname
+docker tag  $1 $uname/$1:1.0
+docker push $uname/$1:1.0
+else 
+echo "exiting..."
+fi
+}
+
+function python() {
 echo "Provide a directory name"
 read dt
 mkdir $dt
@@ -27,7 +41,7 @@ echo "creating image... "
 sudo docker build -t $imgname .
 #echo "to run enter [docker run -dit <imagename>]"
 sudo docker run -it $imgname
-echo "exit..."
+dockerpush $imgname
 }
 
 function java() {
@@ -64,7 +78,7 @@ echo "creating image..."
 sudo docker build -t $imgname .
 echo "running image..."
 sudo docker run -it $imgname
-
+dockerpush $imgname
 }
 function c() {
 echo "Enter a directory name "
@@ -93,8 +107,7 @@ echo "creating image..."
 sudo docker build -t $imgname .
 echo "running image..."
 sudo docker run -it $imgname
-echo "exit..."
-
+dockerpush $imgname
 }
 
 function sql(){
@@ -107,8 +120,11 @@ echo "Provide a sql root password"
 read rootpass
 echo "Provide a database name"
 read dbname
-sudo docker run --name sql1 -e MYSQL_ROOT_PASSWORD=$rootpass -e MYSQL_DATABASE=$dbname -v mysql-data:/var/lib/mysql -p 3306:3306 mysql:8
-
+echo "Provide a container name"
+read cname
+sudo docker run -d --name $cname -e MYSQL_ROOT_PASSWORD=$rootpass -e MYSQL_DATABASE=$dbname -v mysql-data:/var/lib/mysql -p 3306:3306 mysql:8
+sudo docker exec -it $cname mysql -uroot -p
+dockerpush $cname
 }
 case "$img" in
 
