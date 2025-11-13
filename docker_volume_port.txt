@@ -1,0 +1,11 @@
+docker volume create <volume_name>
+
+docker run --name my-nginx-web -d -p 8080:80 -v <volume_name>:/usr/share/nginx/html nginx
+
+#here 8080 is base machine and 80 is container port
+#docker run --name my-nginx-web -d -p 8080:80 -v nginx-data:/usr/share/nginx/html nginx this path is iside img
+
+docker volume ls
+docker volume inspect <volume_name>
+
+
