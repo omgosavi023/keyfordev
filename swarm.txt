@@ -1,0 +1,9 @@
+docker info
+docker swarn init
+docker node js
+docker service create nginx
+docker service ls
+docker service ps <service id>
+docker service update <service id>
+docker service update --replicas <NUMBER-OF-REPLICAS> <SERVICE-NAME>
+docker service update --replicas 5 my-web-app
