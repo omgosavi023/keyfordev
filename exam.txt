@@ -1,0 +1,672 @@
+Github
+    Basic git configuration
+        (to check if user is added)
+        git config user.name
+        (to add username)
+        git config --global user.name "username"
+        (to check if user email is added)
+        git config user.email
+        (to add email)
+        git config --global user.email "email"
+
+    Cloning a git repo
+        git clone <paste the url here>
+
+    Check the status of the repo
+        git status  (to be done in the repo)
+
+    To move files from workspace to staging area
+        git add <filename> or
+        git add .    (. : all files)
+
+    To move files from staging area to local repo
+        git commit -m "your message"
+
+    To move files from local repo to github
+        git push origin main (will require github username and password/token)
+
+    To create a new branch
+        git checkout -b D1  (creates a new brach named D1)
+
+    To switch to a particular branch (there must be a branch already)
+        git switch D1 or   (D1=> branch name)
+        git checkout D1
+
+    To merge branch (Will merge into the current branch)
+        git add.
+        git commit -m "merge D2 into D1"
+        git merge D2    (name of the branch being merged)
+
+    To merge into main branch
+        git switch main   (main =>  name of the main branch)
+        git merge D1
+
+    To remove a branch
+        git branch -d D1  (branch name)
+
+    To check branches
+        git branch
+
+
+Docker
+
+    To run docker commands without using sudo
+        newgrp docker
+        docker $USER
+
+    To run a docker container
+        docker run -dit ubuntu   (-dit =>  are flags,  ubuntu => container name)
+        (-d : to run the container in the background)
+        (-i : to run the container interactively)
+        (-t : to run the container in the terminal)
+
+    To view all running containers
+        docker ps
+
+    To view all running and stopped containers
+        docker ps -a
+
+    To stop a container
+        docker stop <container name or id>
+
+    To start a stopped container
+        docker start <container name or id>
+
+    To remove a container
+        docker rm <container name or id>
+
+    To interact with a container
+        docker exec -it <container name or id> /bin/bash
+
+    To see the images on the local machine
+        docker images
+
+    To pull the image but not run it
+        docker pull <image name>
+
+    To save the image locally (must have pulled the image already)
+        docker save -o <imagename>.tar
+
+    To load from a saved local image
+        docker load -i <imagename>.tar
+
+    To access the container in the browser
+        docker run -p <unusedport>:80 <imagename>
+        eg docker run -p 8080:80 nginx
+        will be accessible on the browser at localhost:<chosen_port_no>
+
+    To make a volume (to not lose data after removing a container)
+        mkdir <dir_name>
+        cd <dir_name>
+        vim <file_name>  eg index.html
+        cd..
+        docker run -p 8080:80 --name=nginx -v ${PWD}/<dir_name>:/usr/share/nginix/html -d nginx
+        (-v is the volume flag for the container <custom path>:<default path>)
+
+    To build a custom docker image (must create a new dir for every new image)
+        mkdir <dir_name>
+        cd <dir_name>
+        vim <file_name>  (eg .py, .java)
+        vim Dockerfile   (will vary depending on program)
+        docker build -t <custom_docker_image_name> .
+        docker run custom_docker_image_name
+
+    To push the image to Dockerhub
+        docker login  (will require dockerhub username and password or token)
+        docker tag <custom_docker_image_name> <dockerhub_id>/<custom_docker_image_name>:1.0
+        docker push <dockerhub_id>/<custom_docker_image_name>:1.0
+
+    Dockerfile for java program
+        # commands for docker build
+        FROM openjdk:17-slim
+        WORKDIR /app
+        COPY helloworld.java /app
+        RUN javac helloworld.java
+        # command for docker run
+        CMD ["java","helloworld"]
+
+    Dockerfile for python program
+        FROM python:3.9-slim-buster
+        WORKDIR /app
+        COPY hello.py /app
+        CMD ["python", "hello.py"]
+
+    Dockerfile for c program
+        FROM gcc:latest
+        WORKDIR /cdac/ditiss/mycode
+        COPY uinput.c /cdac/ditiss/mycode
+        RUN gcc -o uinput uinput.c
+        CMD ["./uinput"]
+
+    Docker networks
+        default is the the docker bridge
+        containers in the same network can interact with each other
+
+        To check the docker network
+            docker network ls
+
+        To create a custom docker network
+            docker network create <network_name>
+
+        To see the details of the network (subnets,etc)
+            docker inspect <network_name>
+
+        To run a docker container in a custom network
+            docker container run -it --network <network_name> image
+
+    Docker compose (must create a docker-compose.yml file)
+
+        To start
+            docker compose up
+
+        To stop
+            docker compose down
+
+        dockercompose for java program
+            services:
+                java-hello-world:
+                    build: .
+                    command: ["java","helloworld"]
+
+        dockercompose for python program
+            services:
+                pyhton-hello-world:
+                    build: .
+
+        dockercomposefor c program
+            services:
+                c-app-runner:
+                    build: .
+                    container_name: c_hello_world_container
+                    restart: "no"
+
+    Docker swarm
+        To check if docker swarm is active
+            docker info
+
+        To start the docker swarm
+            docker swarm init
+
+        To check node
+            docker node ls
+
+        To start a service
+            docker service create <imagename>
+
+        To get get details of the service
+            docker service ls
+
+        To get internal details of the service
+            docker service ps <service_id>
+
+        To update the number of containers running in the service
+            docker service update <service_id> --replicas <number>
+
+            if a container is stopped and removed a new container will start and take its place
+
+        To remove the service
+            docker service rm <service_id>
+
+Kubernetes
+    Install
+        sudo snap install microk8s --classic
+        sudo usermod -a -G microk8s $USER
+        newgrp "alias kubectl='microk8s kubectl'" >> ~/.bashrc
+        source ~/.bashrc
+        kubectl get nodes
+
+    To create a pod (must give name to every pod)
+        kubectl run <pod_name> --image <docker_image>
+
+    To view pods
+        kubectl get pods
+
+    To create a deployment
+        kubectl create deployment <deployment_name> --image <docker_image>
+
+    To view deployment
+        kubectl get deployments   or
+        kubectl get deploy
+
+    To scale up the pods in a deployment
+        kubectl scale deployment <deployment_name> --replicas <number>
+
+    To get the no of replicas
+        kubectl get replicaset    or
+        kubectl get rs
+
+    To attach a service
+        kubectl expose deployment <deployment_name> --type=NodePort --port=80
+
+    To list all services
+        kubectl get svc
+
+    To delete a pod
+        kubectl delete pod <pod_name>
+
+    To delete a deployment
+        kubectl delete deployment <deployment_name>
+
+    To delete a service
+        kubectl delete service <service_name>
+
+Jenkins
+    Install
+        sudo apt install fontconfig openjdk-17-jre
+        sudo apt install openjdk-17-jdk-headless
+        refer to :  https://www.jenkins.io/doc/book/installing/linux/#debianubuntu
+        sudo systemctl enable jenkins
+        sudo systemctl start jenkins
+        sudo systemctl status jenkins
+        Browser localhost:8080
+        cat /var/lib/jenkins/secrets/initialAdminPassword  (cp pass and paste in browser)
+        select install suggested plugins
+        create user: admin everywhere,
+        instance config: do not change
+
+    CREATING A BASIC JOBN IN JENKINS:
+        Name: hello_jenkins
+        Freestyle projects
+        add biuild step -> Execute shell ... in the text area, type echo "hello jenkins!"
+        Save
+        Left side menu: BUild Now
+        Scroll down to see Build History -> #1 -> click -> Colnosle output
+
+    Pipeline
+        Dashboard -> +new Item -> Enter an item: hello_jenkins_pipeline -> Pipeline -> Pipeline: Defination: Pipeline script -> Script: Try sample pipeline... -> Hello WOrld -> Save
+        Build Now -> History -> Console Output
+        Then open the job aconfiguration, add more lines:
+        echo 'Hello admin'
+        echo "Hello from C-DAC"
+        sh 'whoami'
+        Build now -> History -> Console Output
+
+    Another Pipeline
+        pipeline {
+            agent any
+
+            stages {
+                stage('Create') {
+                    steps {
+                        cleanWs()
+
+                        echo 'Assemble a new laptop...'
+                        sh '''
+                        mkdir -p assemble
+                        touch assemble/computer.txt
+                        echo "MotherBoard" >> assemble/computer.txt
+                        cat assemble/computer.txt
+                        echo "Display" >> assemble/computer.txt
+                        cat assemble/computer.txt
+                        echo "CPU" >> assemble/computer.txt
+                        cat assemble/computer.txt
+                        '''
+                    }
+                }
+            stage('Test'){
+                steps{
+                    echo 'Testing the new laptop...'
+                    sh 'test -f assemble/computer.txt'
+                    }
+                post{
+                    success{
+                        archiveArtifacts artifacts:'assemble/**'
+                    }
+                }
+                }
+            }
+        }
+
+    Jenkins and github
+        go to github create a repo and clone
+        create file in the local repo
+        chmod u+x <file_name>
+        git add .
+        git commit -m "message"
+        git push origin main
+        jenkins ui
+        manage jenkins
+        plugins
+        available plugins
+        github
+        select github integration (do not restart jenkins)
+        dashboard
+        new item
+        project_name
+        Freestyle project
+        source code
+        management
+        git
+        paste repo url
+        build to branches
+        branch specifier
+        */main
+        save
+        build now
+
+    poll scm
+        job configuration
+        check poll scm
+        under schedule
+        eg : * * * * *
+        save
+        build now
+
+    Jenkins and docker (imp)
+        create new repo on github
+        clone repo
+        make a jenkins file
+        vim Jenkinsfile
+            pipeline{
+            agent any
+            environment{
+                DOCKER_IMAGE='hello-world-python:1.0' //Docker image name
+            }
+            stages{
+            stage('Checkout'){
+            steps{
+                git branch: 'main', url:
+                'https://github.com/aoditissaug/jenkins_docker_python_hello_world.git'
+                }}
+                stage('Docker Build'){
+                steps{
+                    script{
+                        //check if docker file exits
+                        if (fileExists('Dockerfile')){
+                            sh "docker build -t ${env.DOCKER_IMAGE} ."
+                            }
+                        else{
+                            error "Dockerfile not found in the workspace."
+                        }}}}
+                stage('Docker Run (Optional)'){
+                    steps{
+                        sh "docker run --rm ${env.DOCKER_IMAGE}"
+                    }}}
+                post{
+                    success{
+                        echo 'python application docker image built successfully'
+                    }
+                    failure{
+                        echo 'Docker build or run failed.'
+                    }
+                }
+            }
+
+        vim Dockerfile
+            FROM python:3.9-slim-buster
+            WORKDIR /app
+            COPY hello.py .
+            CMD ["python3", "hello.py"]
+
+        git add .
+        git commit -m "jenkins with docker"
+        git push origin main
+
+        in Jenkins (Browser)
+        new Freestyle project
+        select git
+        branch
+        */main
+        add url for github repo
+        save
+        build now
+        check console output
+
+    To create credentials for dockerhub in jenkins
+        jenkins ui
+        manage jenkins
+        credentials
+        under domain global
+        add credentials
+        scope: Retain global
+        username: dockerhub id
+        password: dockerhub password or access token
+        id: my-docker-hub-credentials
+        create
+
+    To use created dockerhub credentials in Jenkins
+        withCrediantials([usernamePassword(crediantialsId: my-docker-hub-crediantials-id, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+        }
+
+    Docker build and push image to dockerhub (make sure the username in the github and dockerhub urls is correct)
+        fork a repo
+        clone the repo
+        cd into the folder
+        sudo vim Jenkinsfile
+            pipeline {
+                agent any
+
+                environment {
+                    GIT_REPOSITORY_URL = 'https://github.com/aoditissaug/docker_jenkins_demo.git'
+                    DOCKER_IMAGE_NAME = 'aoditiss/docker_jenkins_demo'
+                    IMAGE_TAG = '1.0'
+                }
+
+                stages {
+                    stage('Clone Repository') {
+                        steps {
+                            script {
+                                try {
+                                    git branch: 'main', url: GIT_REPOSITORY_URL
+                                } catch (Exception e) {
+                                    echo "Failed to clone repository: ${e.message}"
+                                    error "Failed to clone repository"
+                                }
+                            }
+                        }
+                    }
+
+                    stage('Build Docker Image') {
+                        steps {
+                            script {
+                                try {
+                                    docker.build("${DOCKER_IMAGE_NAME}:${IMAGE_TAG}")
+                                } catch (Exception e) {
+                                    echo "Failed to build Docker image: ${e.message}"
+                                    error "Failed to build Docker image"
+                                }
+                            }
+                        }
+                    }
+
+                    stage('Push to DockerHub') {
+                        steps {
+                            script {
+                                try {
+                                    withCredentials([usernamePassword(credentialsId: 'my-docker-hub-credentials-id',
+                                                                    usernameVariable: 'DOCKER_USERNAME',
+                                                                    passwordVariable: 'DOCKER_PASSWORD')]) {
+                                        // Explicit login before push
+                                        sh """
+                                        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+                                        docker push ${DOCKER_IMAGE_NAME}:${IMAGE_TAG}
+                                        """
+                                    }
+                                } catch (Exception e) {
+                                    echo "Failed to push Docker image to registry: ${e.message}"
+                                    error "Failed to push Docker image"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        git add .
+        git commit -m "message"
+        git push origin main
+
+        In Jenkins (Browser)
+        new Item
+        item name
+        select pipeline
+        pipeline
+        definition: Pipeline script from SCM
+        SCM
+        git
+        repository url
+        branch specifier
+        */main
+        run the job
+
+        Run the dockerhub image
+        docker run -p ****:***** <imagename>
+
+AWS CLI
+
+    Configure the aws cli
+        aws configure
+        <access_key>
+        <secret_key>
+        region:us-east-1
+        outputformat (dont add)
+        run again to check if configured correctly
+
+    To get the current users details
+        aws sts get-caller-identity
+
+    To get all users in the aws account
+        aws iam list-users --output table
+
+
+    User
+        To create a User
+            aws iam create-user --user-name <username>
+
+        To create an accesskey for user
+            aws iam create-access-key --user-name <username>
+
+        To list access keys for a user
+            aws iam list-access-keys --user-name <username>
+
+        To delete access keys for user
+            aws iam delete-access-key --user-name <username> --access-key-id <accesskeyid>
+
+        To give admin access to user
+            aws iam attach-user-policy --user-name <username> --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
+
+        To remove admin access to user
+            aws iam detach-user-policy --user-name <username> --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
+
+        To delete a user
+            aws iam delete-user --user-name <username>
+
+    S3
+
+        To view all buckets
+            aws s3api list-buckets --query "Buckets[].Name"
+
+        To create a new s3 bucket (name must be unique globally)
+            aws s3api create-bucket --bucket <bucket_name> --region us-east-1
+
+        To upload a file to the bucket
+            aws s3 cp <filename> s3://<bucket_name>/
+
+        To list all files in the bucket
+            aws s3 ls s3://<bucket_name>/
+
+        To delete all the  files in the bucket
+            aws s3 rm s3://<bucket_name> --recursive
+
+        To delete the bucket
+            aws s3api delete-bucket --bucket <bucket_name> --region us-east-1
+
+    EC2
+
+        To list all instances and their states
+            aws ec2 describe-instances --query “Reservations[*].Instances[*].[InstanceID,State.Name,Tags]” –-output table
+
+        To start an instance
+            aws ec2 start-instances --instance-ids <instance_id>
+
+        To stop an instance
+            aws ec2 stop-instances -- instance-ids <instance_id>
+
+        To show all the stopped ec2 instance
+            aws ec2 describe-instances --filters "Name=instance-sate-name,Values=stopped" --query "Reservations[*].Instances[*].[InstanceID,State.Name,Instance Type]" --output table
+
+        To check the instance status after starting/stopping
+            aws ec2 describe-instances --instance-ids i-<your instance id> --query “Reservations[*].Instances[*].[InstanceID,State.Name]” –-output table
+
+Lambda
+
+    S3-Lambda
+        AWS on browser
+        S3
+        create 2 bucket (src and dst)
+        Lambda
+        create function
+        author from scratch
+        give function name
+        runtime:python3.12
+        permissions
+        change default execution role
+        execution role
+        create new role with basic lambda permissions
+        create function
+        code:
+            # Write the names of files uploaded to an S3 bucket to CloudWatch Logs
+
+            import json
+            import logging
+            import boto3
+            import boto3
+            import urllib.parse
+
+            s3 = boto3.client('s3')
+            target_bucket_name = 'YOUR_TARGET_BUCKET_NAME'  # Replace with your target bucket name
+
+            def lambda_handler(event, context):
+                source_bucket_name = 'YOUR_SOURCE_BUCKET_NAME'
+                key = urllib.parse.unquote_plus(event['Records'][0]['s3']['object']['key'], encoding='utf-8')
+
+                try:
+                    copy_source = {'Bucket': source_bucket_name, 'Key': key}
+                    s3.copy(copy_source, target_bucket_name, key)
+                    print(f"Successfully copied {key} from {source_bucket_name} to {target_bucket_name}")
+                except Exception as e:
+                    print(f"Error copying {key}: {e}")
+                    raise e
+        deploy
+
+        configuration
+        permissions
+        open using name of lambda
+        add permissions button
+        attach policies
+        AWSLambdaBasicExectionRole
+        add permissions
+        add permissions button
+        create inline policy
+        json
+            {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Action": [
+                            "s3:GetObject"
+                        ],
+                        "Resource": "arn:aws:s3:::YOUR_SOURCE_BUCKET_NAME/*"
+                    },
+                    {
+                        "Effect": "Allow",
+                        "Action": [
+                            "s3:PutObject"
+                        ],
+                        "Resource": "arn:aws:s3:::YOUR_TARGET_BUCKET_NAME/*"
+                    }
+                ]
+            }
+        give policy name
+        create policy
+
+        IN S3
+        open s3 src bucket
+        properties
+        event notifications
+        create event notifications
+        give name lambda-trigger
+        select the created lambda function
+        save changes
+        now uploading files in src bucket will also be copied into the dst bucket
